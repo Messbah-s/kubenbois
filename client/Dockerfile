@@ -1,6 +1,6 @@
-FROM node:22.20.0-alpine as node
+FROM node:22.20.0-alpine AS node
 WORKDIR /app
-COPY . /app
+COPY . .
 RUN npm install
 RUN npm run build -- --configuration=production
 
