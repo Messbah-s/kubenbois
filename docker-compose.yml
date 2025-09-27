@@ -1,0 +1,25 @@
+services:
+  mariadb:
+    container_name: kubenbois_mariadb_container
+    image: mariadb:10.7.8
+    environment:
+      MARIADB_DATABASE: kubenbois
+      MARIADB_USER: kubenbois
+      MARIADB_PASSWORD: u00vE&^f6Tgs>b;{
+      MARIADB_ROOT_PASSWORD: f5%=P>Y3'5(T,$e
+    restart: unless-stopped
+    volumes:
+      - mariadb_data:/var/lib/kubenbois-mariadb
+
+  server:
+    container_name: kubenbois_server
+    image: kubenbois_server_image:1.0.0
+    build: server/
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+
+volumes:
+  mariadb_data:
