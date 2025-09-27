@@ -21,5 +21,13 @@ services:
     depends_on:
       - mariadb
 
+  client:
+    container_name: kubenbois_client
+    image: kubenbois_client_image:1.0.0
+    build: client/
+    restart: unless-stopped
+    ports:
+      - 9001:80
+
 volumes:
   mariadb_data:
