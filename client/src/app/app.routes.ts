@@ -6,6 +6,11 @@ export const routes: Routes = [
       import('./components/main-menu/main-menu').then(c => c.MainMenu)
   },
   {
+    path: 'settings',
+    loadComponent: () =>
+      import('./view/settings/settings').then(c => c.Settings),
+  },
+  {
     path: '**', redirectTo: '/'
   },
 ];
