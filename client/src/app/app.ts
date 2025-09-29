@@ -26,6 +26,10 @@ export class App {
     this.themeService.start();
   }
 
+  navigateToHome() {
+    this.router.navigate(['']).then();
+  }
+
   navigateToSettings() {
     this.router.navigate(['settings']).then();
   }
