@@ -1,4 +1,4 @@
-package fr.kubenbois.server.web.controller.dto;
+package fr.kubenbois.server.web.dto;
 
 public record LoginRequest(String username, String password) {
 }
