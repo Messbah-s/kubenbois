@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {ThemeService} from '../../service/theme.service';
+import {AuthService} from '../../service/auth-service';
 
 @Component({
   selector: 'app-settings',
@@ -15,6 +16,7 @@ export class Settings {
 
   constructor(
     private themeService: ThemeService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit() {
@@ -30,5 +32,9 @@ export class Settings {
 
   changeTheme(theme: string): void {
     this.themeService.updateTheme(theme)
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

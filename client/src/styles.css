@@ -4,3 +4,7 @@
   themes: all;
 }
 
+@theme {
+  --width-custom-input-form: 300px;
+  --width-custom-content: 600px;
+}

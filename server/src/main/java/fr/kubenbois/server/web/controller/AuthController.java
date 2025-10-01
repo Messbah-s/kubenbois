@@ -2,10 +2,10 @@ package fr.kubenbois.server.web.controller;
 
 import fr.kubenbois.server.domain.service.AppUserService;
 import fr.kubenbois.server.domain.service.JWTService;
-import fr.kubenbois.server.web.controller.dto.LoginRequest;
-import fr.kubenbois.server.web.controller.dto.LoginResponse;
-import fr.kubenbois.server.web.controller.dto.RefreshDTO;
-import fr.kubenbois.server.web.controller.dto.RegisterRequest;
+import fr.kubenbois.server.web.dto.LoginRequest;
+import fr.kubenbois.server.web.dto.LoginResponse;
+import fr.kubenbois.server.web.dto.RefreshDTO;
+import fr.kubenbois.server.web.dto.RegisterRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

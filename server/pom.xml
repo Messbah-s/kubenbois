@@ -117,7 +117,33 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>cz.habarta.typescript-generator</groupId>
+                <artifactId>typescript-generator-maven-plugin</artifactId>
+                <version>3.1.1185</version>
+                <executions>
+                    <execution>
+                        <id>generate</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jsonLibrary>jackson2</jsonLibrary>
+                    <classPatterns>
+                        <pattern>fr.kubenbois.server.web.dto.**</pattern>
+                    </classPatterns>
+                    <excludeClasses>
+                        <class>java.io.Serializable</class>
+                    </excludeClasses>
+                    <outputFile>../client/src/app/definitions/kubenbois.d.ts</outputFile>
+                    <outputKind>global</outputKind>
+                    <namespace>Kubenbois</namespace>
+                    <noFileComment>true</noFileComment>
+                    <sortDeclarations>true</sortDeclarations>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>
