@@ -1,0 +1,33 @@
+<main class="h-full w-full p-6">
+  <h1 class="text-3xl font-bold mb-6">🎲 Lobby des Jeux</h1>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <div class="card bg-base-200 shadow-xl">
+      <figure class="px-10 pt-10">
+        <img src="game/morpion.jpg" alt="Morpion" class="rounded-xl w-32 h-32 object-contain" />
+      </figure>
+      <div class="card-body items-center text-center">
+        <h2 class="card-title">Morpion</h2>
+        <p>Un classique jeu de X et O.</p>
+        <div class="card-actions mt-4">
+          <a routerLink="/morpion" class="btn btn-primary">Jouer</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-200 shadow-xl">
+      <figure class="px-10 pt-10">
+        <img src="game/roborally.jpg" alt="Robo Rally" class="rounded-xl w-32 h-32 object-contain" />
+      </figure>
+      <div class="card-body items-center text-center">
+        <h2 class="card-title">Robo Rally</h2>
+        <p>Déplace ton robot et évite les pièges.</p>
+        <div class="card-actions mt-4">
+          <a routerLink="/robo-rally" class="btn btn-primary">Jouer</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>

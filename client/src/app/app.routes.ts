@@ -21,6 +21,21 @@ export const routes: Routes = [
       import('./view/login/login').then(c => c.Login),
   },
   {
+    path: 'lobby',
+    loadComponent: () =>
+      import('./view/lobby/lobby').then(c => c.Lobby),
+  },
+  {
+    path: 'morpion',
+    loadComponent: () =>
+      import('./view/morpion/morpion').then(c => c.Morpion),
+  },
+  {
+    path: 'robo-rally',
+    loadComponent: () =>
+      import('./view/robo-rally/robo-rally').then(c => c.RoboRally),
+  },
+  {
     path: '**', redirectTo: '/'
   },
 ];
