@@ -1,5 +1,7 @@
-<main class="h-full w-full">
+<main class="flex flex-col h-screen w-full">
   <app-nav-bar></app-nav-bar>
-  <router-outlet/>
+  <div class="flex-1 overflow-y-auto">
+    <router-outlet></router-outlet>
+  </div>
   <app-custom-snackbar></app-custom-snackbar>
 </main>

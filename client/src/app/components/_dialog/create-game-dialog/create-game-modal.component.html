@@ -1,0 +1,49 @@
+<dialog #createGame class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Nouvelle partie de {{ gameName }}</h3>
+
+    @if (playerMini !== playerMax) {
+    <div>
+      <p class="py-4">Choisis le nombre de joueurs :</p>
+
+      <div class="flex flex-col items-center gap-4 mb-6 w-full">
+        <input type="range"
+               class="range range-primary w-full"
+               [(ngModel)]="players"
+               [min]="playerMini"
+               [max]="playerMax"
+               step="1"/>
+
+        <div class="w-full flex justify-between text-xs px-2">
+          @for (val of [].constructor(playerMax - playerMini + 1); track $index; let i = $index) {
+            <span>{{ playerMini + i }}</span>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <div class="mb-6">
+      <p class="py-2 font-semibold">Inviter un ami :</p>
+      <div class="flex flex-col gap-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="inviteFriend1">
+          <span>Bassara</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="inviteFriend2">
+          <span>Khalilou</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="inviteFriend3">
+          <span>Pixy</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-action">
+      <button class="btn btn-ghost" (click)="close()">Annuler</button>
+      <button class="btn btn-primary" (click)="confirm()">Confirmer</button>
+    </div>
+  </div>
+</dialog>
