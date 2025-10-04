@@ -1,0 +1,53 @@
+###
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "admin@kubenbois.fr",
+  "password": "123456Aa"
+}
+
+###
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin@kubenbois.fr",
+  "password": "123456Aa"
+}
+
+> {%
+    client.global.set("jwt", response.body.token);
+    client.assert(response.status === 200, `Expected 200 but received : ${response.status}`)
+%}
+
+###
+POST {{host}}/game/add
+Content-Type: application/json
+Authorization: Bearer {{ jwt }}
+
+{
+  "titre": "Morpion",
+  "url": "morpion",
+  "playerMini": 2,
+  "playerMax": 2,
+  "description": "Un classique jeu de X et O.",
+  "image": "morpion.jpg"
+}
+
+###
+POST {{host}}/game/add
+Content-Type: application/json
+Authorization: Bearer {{ jwt }}
+
+{
+    "titre": "Robo Rally",
+    "url": "robo-rally",
+    "playerMini": 2,
+    "playerMax": 6,
+    "description": "Déplace ton robot et évite les pièges.",
+    "image": "roborally.jpg"
+}
+
+###
+GET {{host}}/init

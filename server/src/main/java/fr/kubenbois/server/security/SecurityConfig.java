@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/init/**").permitAll()
                         .anyRequest().authenticated());
         return http.build();
     }
