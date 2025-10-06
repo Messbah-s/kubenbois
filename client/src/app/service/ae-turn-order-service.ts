@@ -35,8 +35,13 @@ export class AeTurnOrderService {
     this.turnPlayed().splice(index, 1)
   }
 
+  takeBackCard(selectedCard: string, index: number) {
+    this.turnOrder().unshift(selectedCard);
+    this.turnPlayed().splice(index, 1);
+  }
+
   resetTurnOrder() {
-    this.turnOrder.update(_=> this.utils.shuffle(["1", "2", "3", "4", "Némésis 1", "Némésis 2"]));
-    this.turnPlayed.update(_=> []);
+    this.turnOrder.update(_ => this.utils.shuffle(["1", "2", "3", "4", "Némésis 1", "Némésis 2"]));
+    this.turnPlayed.update(_ => []);
   }
 }

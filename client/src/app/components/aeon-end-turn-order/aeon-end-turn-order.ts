@@ -34,6 +34,11 @@ export class AeonEndTurnOrder {
     this.selectedCard = "";
   }
 
+  takeBackCard() {
+    this.aeTurnOrderService.takeBackCard(this.selectedCard, this.index);
+    this.selectedCard = "";
+  }
+
   selectCard(played: string, index: number) {
     this.selectedCard = played;
     this.index = index;
