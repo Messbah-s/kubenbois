@@ -36,6 +36,11 @@ export const routes: Routes = [
       import('./view/robo-rally/robo-rally').then(c => c.RoboRally),
   },
   {
+    path: 'ae-turn',
+    loadComponent: () =>
+      import('./components/aeon-end-turn-order/aeon-end-turn-order').then(c => c.AeonEndTurnOrder),
+  },
+  {
     path: '**', redirectTo: '/'
   },
 ];
