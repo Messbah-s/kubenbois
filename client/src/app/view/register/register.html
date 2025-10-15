@@ -27,8 +27,8 @@
                              [errorMessage]="'Les mots de passe ne correspondent pas.'">
       </app-custom-form-input>
       <div class="flex justify-end">
-        <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || (loadingState$ | async)">
-          @if (loadingState$ | async) {
+        <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || loadingState()">
+          @if (loadingState()) {
             <span class="loading loading-spinner loading-xs"></span>
           }
           Register

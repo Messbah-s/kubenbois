@@ -8,7 +8,7 @@
     </svg>
     Home
   </button>
-  @if ((loginState$ | async)) {
+  @if (!loginState()) {
     <button (click)="navigateToLogin()"
             class="cursor-pointer inline-flex items-center gap-2 rounded-lg px-4 py-2 shadow transition">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"

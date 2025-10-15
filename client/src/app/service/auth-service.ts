@@ -1,7 +1,6 @@
-import {Injectable} from '@angular/core';
+import {effect, inject, Injectable, signal} from '@angular/core';
 import {LoginStateService} from '../stateService/login-state-service';
 import RegisterRequest = Kubenbois.RegisterRequest;
-import {BehaviorSubject, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {AlertService} from './alert-service';
 
@@ -10,48 +9,56 @@ import {AlertService} from './alert-service';
 })
 export class AuthService {
 
-  private registerLoadingStateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private loginLoadingStateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private loginStateService: LoginStateService = inject(LoginStateService);
+  private alertService: AlertService = inject(AlertService);
+  private router: Router = inject(Router);
 
-  constructor(private loginStateService: LoginStateService,
-              private alertService: AlertService,
-              private router: Router) {
+  private registerLoadingState = signal(false);
+  private loginLoadingState = this.loginStateService.isLogging;
+
+  constructor() {
+    effect(() => {
+      if (this.loginStateService.isLoggedIn()) {
+        this.router.navigate(['']).then();
+      }
+
+      if (this.loginStateService.hasLoginError()) {
+        this.alertService.showError('Identifiants incorrects, veuillez réessayer');
+      }
+
+      if (this.loginStateService.registerSuccess()) {
+        this.registerLoadingState.set(false);
+        this.alertService.showSuccess('Inscription terminée');
+        this.router.navigate(['login']).then();
+        this.loginStateService.registerSuccess.set(false);
+      }
+
+      if (this.loginStateService.registerError()) {
+        this.registerLoadingState.set(false);
+        this.loginStateService.registerError.set(null);
+      }
+    });
   }
 
-  public selectRegisterLoadingState(): Observable<boolean> {
-    return this.registerLoadingStateSubject.asObservable();
+  public selectRegisterLoadingState() {
+    return this.registerLoadingState;
   }
 
-  public selectLoginLoadingState(): Observable<boolean> {
-    return this.loginLoadingStateSubject.asObservable();
+  public selectLoginLoadingState() {
+    return this.loginLoadingState;
   }
 
   public register(registerData: RegisterRequest) {
-    this.registerLoadingStateSubject.next(true);
-    this.loginStateService.registerAction(registerData).pipe(
-      finalize(() => this.registerLoadingStateSubject.next(false))
-    )
-      .subscribe({
-        next: (_) => {
-          this.router.navigate(['login']).then();
-          this.alertService.showSuccess('Inscription terminé');
-        },
-        error: (_) => {
-          this.alertService.showError('Inscription échoué');
-        }
-      });
+    this.registerLoadingState.set(true);
+    this.loginStateService.registerAction(registerData);
   }
 
   logUser(username: string, password: string) {
-    this.loginStateService.loginAction(username, password).subscribe({
-      next: (_) => this.router.navigate(['']).then(),
-      error: (_) => this.alertService.showError('Identifiants incorrecte, veuillez réessayer'),
-    });
+    this.loginStateService.loginAction(username, password)
   }
 
   logout() {
-    this.loginStateService.logoutAction().subscribe({
-      next: (_) => this.router.navigate(['login']).then(),
-    });
+    this.loginStateService.logoutAction()
+    this.router.navigate(['login']).then();
   }
 }

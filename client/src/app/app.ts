@@ -1,6 +1,5 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, effect, inject, ViewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
-import {Observable} from 'rxjs';
 import {ThemeService} from './service/theme.service';
 import {CustomSnackbar} from './components/custom-snackbar/custom-snackbar';
 import {AlertService} from './service/alert-service';
@@ -14,15 +13,14 @@ import {NavBar} from './components/nav-bar/nav-bar';
 })
 export class App {
   @ViewChild(CustomSnackbar) snackbar!: CustomSnackbar;
-  theme$: Observable<string> = new Observable();
+  private alertService = inject(AlertService);
+  private themeService = inject(ThemeService);
 
-  constructor(private alertService: AlertService,
-              private themeService: ThemeService) {
-    this.theme$ = this.themeService.selectThemeState();
-    this.theme$.subscribe({
-      next: (value) => {
-        document.documentElement.setAttribute('data-theme', value);
-      },
+  theme = this.themeService.getTheme;
+
+  constructor() {
+    effect(() => {
+      document.documentElement.setAttribute('data-theme', this.theme());
     });
   }
 

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {Component, effect, inject, signal} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
 import {ThemeService} from '../../service/theme.service';
 import {AuthService} from '../../service/auth-service';
 
@@ -12,29 +12,27 @@ import {AuthService} from '../../service/auth-service';
   styleUrl: './settings.css'
 })
 export class Settings {
-  theme: FormControl<string> = new FormControl();
+  private themeService = inject(ThemeService);
+  private authService = inject(AuthService);
 
-  constructor(
-    private themeService: ThemeService,
-    private authService: AuthService,
-  ) {}
+  theme = signal(this.themeService.getTheme());
+  themes = ['night','light','dark','synthwave','forest','abyss'];
 
-  ngOnInit() {
-    let savedTheme: string | null = localStorage.getItem('theme');
-    savedTheme
-      ? this.theme.setValue(savedTheme, { emitEvent: false })
-      : this.theme.setValue('night', { emitEvent: false });
-    this.theme.valueChanges.subscribe((value) => {
-      localStorage.setItem('theme', value!);
-      this.changeTheme(this.theme.value!);
+  constructor() {
+    effect(() => {
+      const value = this.theme();
+      if (value) {
+        this.themeService.updateTheme(value);
+        localStorage.setItem('theme', value);
+      }
     });
-  }
-
-  changeTheme(theme: string): void {
-    this.themeService.updateTheme(theme)
   }
 
   logout() {
     this.authService.logout();
+  }
+
+  setTheme(value: string) {
+    this.theme.set(value);
   }
 }

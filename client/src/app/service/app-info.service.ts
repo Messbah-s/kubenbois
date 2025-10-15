@@ -1,31 +1,22 @@
-import { Injectable } from '@angular/core';
+import {computed, Injectable, signal} from '@angular/core';
 import {AppInfoHttpService} from '../httpService/app-info-http.service';
-import {BehaviorSubject, map, Observable, tap} from 'rxjs';
+import {tap} from 'rxjs';
 import InitAppDTO = Kubenbois.InitAppDTO;
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppInfoService {
-  private state: InitAppDTO = { games: [] };
-  private infoAppSubject = new BehaviorSubject<InitAppDTO>(this.state);
+  public appInfo = signal<InitAppDTO>({ games: [] });
+  public games = computed(() => this.appInfo().games);
 
   constructor(private appInfoHttpService: AppInfoHttpService) {
-    this.loadAppInfo().subscribe();
+    this.loadAppInfo()
   }
 
-  public getGames(): Observable<InitAppDTO['games']> {
-    return this.infoAppSubject.asObservable().pipe(map(state => state.games));
-  }
-
-  private loadAppInfo(): Observable<InitAppDTO> {
-    return this.appInfoHttpService.requestInfos().pipe(
-      tap(newState => this.updateState(newState))
-    );
-  }
-
-  private updateState(newState: InitAppDTO): void {
-    this.state = newState;
-    this.infoAppSubject.next(this.state);
+  private loadAppInfo(): void {
+    this.appInfoHttpService.requestInfos().pipe(
+      tap(newState => this.appInfo.set(newState))
+    ).subscribe();
   }
 }

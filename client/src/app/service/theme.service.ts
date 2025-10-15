@@ -1,16 +1,17 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import {Injectable, signal} from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
-  themeSubject: BehaviorSubject<string> = new BehaviorSubject('night');
+  private theme = signal<string>(
+    localStorage.getItem('theme') ?? 'night'
+  );
 
   constructor() {}
 
-  public selectThemeState() {
-    return this.themeSubject.asObservable();
+  get getTheme() {
+    return this.theme;
   }
 
   start() {
@@ -22,6 +23,8 @@ export class ThemeService {
   }
 
   updateTheme(theme: string) {
-    this.themeSubject.next(theme);
+    this.theme.set(theme)
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
   }
 }

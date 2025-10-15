@@ -16,8 +16,8 @@
                            [hasError]="false">
     </app-custom-form-input>
     <div class="flex justify-end">
-      <button class="btn btn-primary" [disabled]="loginForm.invalid || (loadingState$ | async)">
-        @if (loadingState$ | async) {
+      <button class="btn btn-primary" [disabled]="loginForm.invalid || loadingState()">
+        @if (loadingState()) {
           <span class="loading loading-spinner loading-xs"></span>
         }
         Log

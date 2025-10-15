@@ -1,17 +1,14 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, inject, Signal, ViewChild} from '@angular/core';
 import {CreateGameModal} from '../../components/_dialog/create-game-dialog/create-game-modal.component';
 import {Router} from '@angular/router';
 import {AppInfoService} from '../../service/app-info.service';
-import {Observable} from 'rxjs';
-import {AsyncPipe} from '@angular/common';
 import GameDTO = Kubenbois.GameDTO;
 import InitAppDTO = Kubenbois.InitAppDTO;
 
 @Component({
   selector: 'app-lobby',
   imports: [
-    CreateGameModal,
-    AsyncPipe
+    CreateGameModal
   ],
   templateUrl: './lobby.html',
   styleUrl: './lobby.css'
@@ -19,12 +16,9 @@ import InitAppDTO = Kubenbois.InitAppDTO;
 export class Lobby {
   @ViewChild('createGameModal') createGameModal!: CreateGameModal;
 
-  games$: Observable<InitAppDTO['games']>;
+  games: Signal<InitAppDTO['games']> = inject(AppInfoService).games;
 
-  constructor(private router: Router,
-              private appInfoService: AppInfoService) {
-    this.games$ = this.appInfoService.getGames();
-  }
+  constructor(private router: Router) {}
 
   openCreateGame(game: GameDTO) {
     this.createGameModal.gameName = game.titre;

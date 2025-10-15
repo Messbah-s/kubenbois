@@ -1,11 +1,9 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, catchError, map, Observable, of, switchMap, take} from 'rxjs';
+import {computed, inject, Injectable, signal} from '@angular/core';
 import {AuthHttpService} from '../httpService/auth-http-service';
 import {UserToken} from '../definitions/interface/user-token.interface';
 import {jwtDecode} from 'jwt-decode';
 import RegisterRequest = Kubenbois.RegisterRequest;
 import {AlertService} from '../service/alert-service';
-import LoginResponse = Kubenbois.LoginResponse;
 
 export interface LoginStateInterface {
   accessToken: string | null;
@@ -35,78 +33,60 @@ export class LoginStateService {
     hasError: false,
   };
 
-  private authStateSubject: BehaviorSubject<LoginStateInterface> = new BehaviorSubject<LoginStateInterface>(this.state);
+  public loginState = signal<LoginStateInterface>(this.state);
+  public registerSuccess = signal(false);
+  public registerError = signal<string | null>(null);
 
-  constructor(private authHttpService: AuthHttpService,
-              private alertService: AlertService) {
+  private authHttpService: AuthHttpService = inject(AuthHttpService);
+  private alertService: AlertService = inject(AlertService);
+
+  private updateState(partial: Partial<LoginStateInterface>) {
+    this.loginState.update((prev) => ({ ...prev, ...partial }));
   }
 
-  private updateState(newState: LoginStateInterface): void {
-    this.state = newState;
-    this.authStateSubject.next(this.state);
-  }
+  public isLoggedIn = computed(() =>
+    this.loginState().loginStatus === 'LOGGED'
+  );
 
-  public selectLoginState(): Observable<LoginStateInterface> {
-    return this.authStateSubject.asObservable();
-  }
+  public isLogging = computed(() =>
+    this.loginState().loginStatus === 'INIT_LOGIN' ||
+    this.loginState().loginStatus === 'START_LOGIN'
+  );
 
-  public selectLoginStatus(): Observable<boolean> {
-    return this.authStateSubject.asObservable().pipe(map((value) => value.loginStatus === 'LOGGED'));
-  }
+  public hasLoginError = computed(
+    () =>
+      this.loginState().loginStatus === 'FAILURE' ||
+      this.loginState().hasError
+  );
 
-  public initLoginAction(): Observable<LoginStateInterface> {
+  public loginAction(username: string, password: string): void {
     const newState: LoginStateInterface = {
-      ...this.state,
-      loginStatus: 'INIT_LOGIN',
-    };
-    this.updateState(newState);
-    const accessToken: string | null = localStorage.getItem('access_token');
-    const refreshToken: string | null = localStorage.getItem('refresh_token');
-
-    if (accessToken && refreshToken) {
-      return this.loginSuccessAction(accessToken, refreshToken);
-    } else {
-      this.loginFailureAction(false);
-      return of();
-    }
-  }
-
-  public loginByTokenAction(accessToken: string, refreshToken: string): Observable<void> {
-    const newState: LoginStateInterface = {
-      ...this.state,
+      ...this.loginState(),
       loginStatus: 'START_LOGIN',
       hasError: false,
     };
     this.updateState(newState);
 
-    return this.loginSuccessAction(accessToken, refreshToken).pipe(switchMap(() => of(undefined)));
-  }
+    this.authHttpService.login(username, password).subscribe({
+      next: (value) => {
+        const accessToken = value.token;
+        const refreshToken = value.refreshToken;
 
-  public loginAction(username: string, password: string): Observable<LoginStateInterface> {
-    const newState: LoginStateInterface = {
-      ...this.state,
-      loginStatus: 'START_LOGIN',
-      hasError: false,
-    };
-    this.updateState(newState);
-
-    return this.authHttpService.login(username, password).pipe(
-      switchMap((value) => {
-        const accessToken: string | null = value.token;
-        const refreshToken: string | null = value.refreshToken;
         if (accessToken && refreshToken) {
-          return this.loginSuccessAction(accessToken, refreshToken);
+          this.loginSuccessAction(accessToken, refreshToken);
         } else {
           this.loginFailureAction(true);
-          return of();
         }
-      }),
-    );
+      },
+      error: (err) => {
+        this.loginFailureAction(true);
+      }
+    });
   }
 
-  public logoutAction(): Observable<void> {
+  public logoutAction(): void {
     const newState: LoginStateInterface = {
-      ...this.state,
+      ...this.loginState(),
       accessToken: null,
       refreshToken: null,
       username: null,
@@ -118,19 +98,17 @@ export class LoginStateService {
     this.updateState(newState);
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-
-    return of(undefined);
   }
 
-  private loginSuccessAction(accessToken: string, refreshToken: string): Observable<LoginStateInterface> {
+  private loginSuccessAction(accessToken: string, refreshToken: string): void {
     const newState: LoginStateInterface = {
-      ...this.state,
+      ...this.loginState(),
       loginStatus: 'SUCCESS',
     };
     this.updateState(newState);
     const decodedAccessToken: UserToken = jwtDecode<UserToken>(accessToken);
 
-    return this.logUserAction(
+    this.logUserAction(
       accessToken,
       decodedAccessToken.sub,
       decodedAccessToken.id,
@@ -142,12 +120,12 @@ export class LoginStateService {
 
   private loginFailureAction(hasError: boolean): void {
     const newState: LoginStateInterface = {
-      ...this.state,
+      ...this.loginState(),
       loginStatus: 'FAILURE',
       hasError: hasError,
     };
     this.updateState(newState);
-    this.logoutAction().pipe(take(1)).subscribe();
+    this.logoutAction();
   }
 
   private logUserAction(
@@ -157,9 +135,9 @@ export class LoginStateService {
     remember: boolean,
     exp: Date,
     refreshToken: string,
-  ): Observable<LoginStateInterface> {
+  ): void {
     const newState: LoginStateInterface = {
-      ...this.state,
+      ...this.loginState(),
       accessToken: accessToken,
       refreshToken: refreshToken,
       username: sub,
@@ -171,29 +149,21 @@ export class LoginStateService {
     this.updateState(newState);
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
-
-    return of(newState);
   }
 
-  public registerAction(data: RegisterRequest): Observable<LoginResponse> {
-    const newState: LoginStateInterface = {
-      ...this.state,
-    };
-    this.updateState(newState);
-
-    return this.authHttpService.register(data).pipe(
-      catchError((err) => {
-        this.updateState({
-          ...this.state,
-          hasError: err.error.message,
-        });
-        if (err.error.code.includes('UsernameAlreadyTaken')) {
-          this.alertService.showError('Email déjà utilisé');
-        } else {
-          this.alertService.showError("Erreur lors de l'inscription, veuillez réessayer");
-        }
-        return of();
-      }),
-    );
+  public registerAction(data: RegisterRequest): void {
+    this.authHttpService.register(data).subscribe({
+      next: (res) => {
+        this.registerSuccess.set(true);
+        this.registerError.set(null);
+      },
+      error: (err) => {
+        this.registerError.set(err.error.message);
+        this.registerSuccess.set(false);
+        const isUsernameTaken = err.error.code?.includes('UsernameAlreadyTaken');
+        this.alertService.showError(isUsernameTaken ? 'Email déjà utilisé' : "Erreur lors de l'inscription, veuillez réessayer");
+      },
+      complete: () => {}
+    });
   }
 }

@@ -1,32 +1,29 @@
-import {Component} from '@angular/core';
+import {Component, Signal, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CustomFormInput} from '../../components/custom-form-input/custom-form-input';
 import {STRONG_PASSWORD_REGEX, VALID_EMAIL_REGEX} from '../validator/validator.regex';
 import Validation from '../validator/validation';
 import RegisterRequest = Kubenbois.RegisterRequest;
 import {AuthService} from '../../service/auth-service';
-import {Observable} from 'rxjs';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
   selector: 'app-register',
   imports: [
     ReactiveFormsModule,
-    CustomFormInput,
-    AsyncPipe
+    CustomFormInput
   ],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
 export class Register {
-  loadingState$: Observable<boolean> = new Observable();
+  loadingState: Signal<boolean> = signal<boolean>(false);
   registerForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
   ) {
-    this.loadingState$ = this.authService.selectRegisterLoadingState();
+    this.loadingState = this.authService.selectRegisterLoadingState();
     this.registerForm = this.fb.group(
       {
         username: new FormControl<string>('', [Validators.required, Validators.pattern(VALID_EMAIL_REGEX)]),

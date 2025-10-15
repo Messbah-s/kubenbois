@@ -10,84 +10,24 @@
             <div class="flex flex-col gap-2">
               <p class="flex w-full text-2xl px-1">Thèmes</p>
               <div class="dropdown">
-                <div tabindex="0" role="button" class="btn m-1">
-                  {{ theme.value }}
-                  <svg
-                    width="12px"
-                    height="12px"
-                    class="inline-block h-2 fill-current opacity-60 px-2 w-full"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 2048 2048"
-                  >
-                    <path
-                      d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"
-                    ></path>
-                  </svg>
+                <div tabindex="0" class="btn m-1">
+                  {{ theme() }}
                 </div>
-                <ul
-                  tabindex="0"
-                  class="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl"
-                >
-                  <li>
-                    <input
-                      type="radio"
-                      name="theme-dropdown"
-                      class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                      aria-label="Default"
-                      value="night"
-                      [formControl]="theme"
-                    />
-                  </li>
-                  <li>
-                    <input
-                      type="radio"
-                      name="theme-dropdown"
-                      class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                      aria-label="Light"
-                      value="light"
-                      [formControl]="theme"
-                    />
-                  </li>
-                  <li>
-                    <input
-                      type="radio"
-                      name="theme-dropdown"
-                      class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                      aria-label="Dark"
-                      value="dark"
-                      [formControl]="theme"
-                    />
-                  </li>
-                  <li>
-                    <input
-                      type="radio"
-                      name="theme-dropdown"
-                      class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                      aria-label="Synthwave"
-                      value="synthwave"
-                      [formControl]="theme"
-                    />
-                  </li>
-                  <li>
-                    <input
-                      type="radio"
-                      name="theme-dropdown"
-                      class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                      aria-label="Forest"
-                      value="forest"
-                      [formControl]="theme"
-                    />
-                  </li>
-                  <li>
-                    <input
-                      type="radio"
-                      name="theme-dropdown"
-                      class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                      aria-label="abyss"
-                      value="abyss"
-                      [formControl]="theme"
-                    />
-                  </li>
+                <ul tabindex="0" class="dropdown-content bg-base-300 rounded-box w-52 p-2 shadow-2xl">
+                  @for (t of themes; track t) {
+                    <li>
+                      <label class="btn btn-sm btn-block btn-ghost justify-start">
+                        <input
+                          type="radio"
+                          name="theme-dropdown"
+                          [value]="t"
+                          [checked]="theme() === t"
+                          (change)="setTheme(t)"
+                        />
+                        {{ t }}
+                      </label>
+                    </li>
+                  }
                 </ul>
               </div>
             </div>
